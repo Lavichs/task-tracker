@@ -137,6 +137,7 @@ class TaskList:
             print(getColoredText("Список задач пуст", GREEN))
             return 0
         print(getColoredText("ID\tстатус\t\tописание", VIOLET))
+        count = 0
         for task in self.tasks:
             if filter != '' and task.status != filter:
                 continue
@@ -146,6 +147,8 @@ class TaskList:
             else:
                 colored_status += '\t\t'
             print(f"{task.id}\t{colored_status}{task.description}")
+            count += 1
+        print(f"Total: {count}")
 
     def update(self, _id, new_description):
         # task = list(filter(lambda task: task.id == _id, self.tasks))[0]
