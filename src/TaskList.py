@@ -1,3 +1,5 @@
+import sys
+
 from src.Task import Task
 from src.consts import *
 from src.utils import getColoredText
@@ -58,7 +60,8 @@ class TaskList:
         print(f"Total: {count}")
 
     def update(self, _id, new_description):
-        # task = list(filter(lambda task: task.id == _id, self.tasks))[0]
-        # self.
         task = next((task for task in self.tasks if task.id == _id), None)
+        if task is None:
+            print(getColoredText(f"Задача с ID: {_id} не найдена", RED))
+            sys.exit()
         task.description = new_description
