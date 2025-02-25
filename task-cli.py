@@ -174,37 +174,39 @@ def loadTasks() -> TaskList:
 def main():
     # определение главного парсера
     parser = argparse.ArgumentParser(prog='task-cli',
-                                     description='CLI app to track your tasks and manage your to-do list')
+                                     description='CLI-приложение для отслеживания ваших задач и управления списком дел.'
+                                                ' (CLI app to track your tasks and manage your ToDo list)')
     # создание объекта, который будет создавать суб парсеры
-    subparsers = parser.add_subparsers(help='List of commands')
+    subparsers = parser.add_subparsers(help='Список команд. (List of commands)')
 
     # создание суб парсеров для команд действия для разных сценариев выполнения программы
     # каждый парсер будет иметь свой набор аргументов
-    add_parser = subparsers.add_parser("add", help='add task')  # создание
-    update_parser = subparsers.add_parser("update", help='update task')  # обновление
-    delete_parser = subparsers.add_parser("delete", help='update task')  # удаление
-    list_parser = subparsers.add_parser("list", help='update task')  # вывод (чтение)
+    add_parser = subparsers.add_parser("add", help='добавить задачу. (add task)')  # создание
+    update_parser = subparsers.add_parser("update", help='обновить задачу. (update task)')  # обновление
+    delete_parser = subparsers.add_parser("delete", help='удалить. (delete task)')  # удаление
+    list_parser = subparsers.add_parser("list", help='вывести список задач. (display a list of tasks)')  # вывод (чтение)
 
     # аргументы для создания
     # описание новой задачи
     add_parser.add_argument(fields.description,
-                            type=str, help='description of new task')
+                            type=str, help='описание новой задачи. (description of new task)')
 
     # аргументы для обновления
     # ID задачи которую нужно обновить
     update_parser.add_argument(fields.id_upd,
-                               type=int, help='ID of task')
+                               type=int, help='ID задачи. (ID of task)')
 
     # аргументы для удаления
     # ID задачи которую нужно удалить
     delete_parser.add_argument(fields.id_del,
-                               type=int, help='ID of task')
+                               type=int, help='ID задачи. (ID of task)')
 
     # аргументы для чтения (вывода)
     # статус по которому нужно отфильтровать задачи при выводе
     list_parser.add_argument(fields.filter,
                              type=str,
-                             help='one of the following statuses: done, todo, in-progres',
+                             help='один из следующих статусов: [done, todo, in-progres]. '
+                                  ' (one of the following statuses: [done, todo, in-progres])',
                              nargs='?',
                              default="")
 
