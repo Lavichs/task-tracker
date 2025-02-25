@@ -1,4 +1,5 @@
 import argparse
+import ctypes
 import json
 import os
 
@@ -7,10 +8,10 @@ from src.TaskList import TaskList
 from src.consts import *
 from src.utils import getColoredText
 
-from colorama import init
-
-# Инициализация colorama
-init()
+if os.name == 'nt':
+    # Включаем поддержку ANSI-кодов на Windows
+    kernel32 = ctypes.windll.kernel32
+    kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)  # ENABLE_VIRTUAL_TERMINAL_PROCESSING
 
 
 def loadTasks() -> TaskList:
