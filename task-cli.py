@@ -2,6 +2,7 @@ import argparse
 import ctypes
 import json
 import os
+import sys
 
 from src.Task import Task
 from src.TaskList import TaskList
@@ -26,10 +27,14 @@ def loadTasks() -> TaskList:
                 json_data = json.loads(data)
                 taskList = TaskList(json_data)
                 return taskList
-            except Exception as e:
+            except json.decoder.JSONDecodeError as e:
                 # если не удалось корректно загрузить данные
                 print(getColoredText("Не удалось загрузить список задач. "
-                                     "Проверьте целостность файла tasks.json или удалите его", YELLOW))
+                                     "Проверьте целостность файла tasks.json или удалите его", RED))
+                sys.exit(0)
+            except Exception as error:
+                print(getColoredText(f"Произошла непредвиденная ошибка ({error})"))
+                sys.exit(0)
     return TaskList()
 
 
