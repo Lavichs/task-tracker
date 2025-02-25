@@ -27,9 +27,10 @@ class ActionsList:
     list = "list"
 
 
-class SecondFields:
+class AdditionalFields:
     description = 'description'  # second field of command "add"
     id_upd = 'id_upd'  # second field of command "update"
+    new_description = 'new_description'  # third field of command "update"
     id_del = 'id_del'  # second field of command "delete"
     filter = 'filter'  # second field of command "list"
 
@@ -146,9 +147,15 @@ class TaskList:
                 colored_status += '\t\t'
             print(f"{task.id}\t{colored_status}{task.description}")
 
+    def update(self, _id, new_description):
+        # task = list(filter(lambda task: task.id == _id, self.tasks))[0]
+        # self.
+        task = next((task for task in self.tasks if task.id == _id), None)
+        task.description = new_description
+
 
 actions = ActionsList()
-fields = SecondFields()
+fields = AdditionalFields()
 statuses = Statuses()
 
 
@@ -195,6 +202,9 @@ def main():
     # ID задачи которую нужно обновить
     update_parser.add_argument(fields.id_upd,
                                type=int, help='ID задачи. (ID of task)')
+    # новое описание задачи
+    update_parser.add_argument(fields.new_description,
+                               type=str, help='новое описание задачи. (new description of task)')
 
     # аргументы для удаления
     # ID задачи которую нужно удалить
@@ -229,7 +239,16 @@ def main():
         print(getColoredText(f"Задача успешно добавлена (ID: {task.id})", GREEN))
 
     if fields.id_upd in args:
-        ...
+        _id = arguments.get(fields.id_upd)
+        new_description = arguments.get(fields.new_description)
+
+        taskList = loadTasks()
+        taskList.update(_id, new_description)
+
+        # сохранить список в формате json
+        with open('tasks.json', 'w') as json_file:
+            json_file.write(taskList.__repr__().replace("'", '"'))
+        print(getColoredText(f"Задача успешно обновлена (ID: {_id}, описание: {new_description})", GREEN))
     if fields.id_del in args:
         ...
     if fields.filter in args:
