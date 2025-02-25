@@ -2,10 +2,22 @@ import argparse
 import datetime
 import json
 import os
-from colorama import Fore, Style, init
+
+from colorama import init
 
 # Инициализация colorama
 init()
+
+RED = (255, 21, 21)
+GREEN = (0, 180, 0)
+YELLOW = (220, 220, 21)
+BLUE = (51, 51, 255)
+VIOLET = (200, 0, 200)
+WHITE = (255, 255, 255)
+
+
+def getColoredText(text, color):
+    return f"\033[38;2;{color[0]};{color[1]};{color[2]}m" + text + "\033[0m"
 
 
 class ActionsList:
@@ -26,6 +38,18 @@ class Statuses:
     todo = "todo"
     in_progress = "in-progress"
     done = "done"
+
+    @staticmethod
+    def getStatusColor(status):
+        match status:
+            case Statuses.todo:
+                return YELLOW
+            case Statuses.in_progress:
+                return BLUE
+            case Statuses.done:
+                return GREEN
+            case _:
+                return WHITE
 
 
 class Task:
@@ -101,10 +125,50 @@ class TaskList:
     "tasks": {[item.toDict() for item in self.tasks]}
 }}"""
 
+    def show(self, filter):
+        """
+        Данная функция выводит на экран список дел отфильтрованных по статусу
+        (если фильтр пустой – выводятся все задачи)
+        :param filter: str
+        :return: None
+        """
+        if len(self.tasks) == 0:
+            print(getColoredText("Список задач пуст", GREEN))
+            return 0
+        print(getColoredText("ID\tстатус\t\tописание", VIOLET))
+        for task in self.tasks:
+            if filter != '' and task.status != filter:
+                continue
+            colored_status = getColoredText(task.status, statuses.getStatusColor(task.status))
+            if task.status == statuses.in_progress:
+                colored_status += '\t'
+            else:
+                colored_status += '\t\t'
+            print(f"{task.id}\t{colored_status}{task.description}")
+
 
 actions = ActionsList()
 fields = SecondFields()
 statuses = Statuses()
+
+
+def loadTasks() -> TaskList:
+    # если файл со списком задач существует
+    if os.path.isfile('tasks.json'):
+        # открываем его на чтение
+        with open('tasks.json', 'r') as json_file:
+            data = json_file.read()
+            try:
+                # если данные корректно загружаются
+                # создавать список дел на основе данных файла
+                json_data = json.loads(data)
+                taskList = TaskList(json_data)
+                return taskList
+            except Exception as e:
+                # если не удалось корректно загрузить данные
+                print(getColoredText("Не удалось загрузить список задач. "
+                                     "Проверьте целостность файла tasks.json или удалите его", YELLOW))
+    return TaskList()
 
 
 def main():
@@ -152,39 +216,23 @@ def main():
     # выбранное действие определяется по полученным аргументам полученным из парсера, т.к. у каждого субпарсера они свои
     # если в аргументах есть description, значит выполняется действие add (далее description -> add)
     if fields.description in args:
-        # если файл со списком задач существует
-        if os.path.isfile('tasks.json'):
-            # открываем его на чтение
-            with open('tasks.json', 'r') as json_file:
-                data = json_file.read()
-                try:
-                    # если данные корректно загружаются
-                    # создавать список дел на основе данных файла
-                    json_data = json.loads(data)
-                    taskList = TaskList(json_data)
-                except Exception as e:
-                    # если не удалось корректно загрузить данные
-                    # создать пустой список дел
-                    taskList = TaskList()
-        else:
-            # если файла со списком задач не существует – создаем пустой список дел
-            taskList = TaskList()
+        taskList = loadTasks()
 
         task = Task.createNewTask(taskList.getAvailableId(), arguments.get(fields.description))
         taskList.addTask(task)
 
         # сохранить список в формате json
         with open('tasks.json', 'w') as json_file:
-            json_file.write(taskList.__repr__().replace("'", '"').replace(" ", ''))
-
-        print(Fore.GREEN + f"Task added successfully (ID: {task.id})" + Style.RESET_ALL)
+            json_file.write(taskList.__repr__().replace("'", '"'))
+        print(getColoredText(f"Задача успешно добавлена (ID: {task.id})", GREEN))
 
     if fields.id_upd in args:
         ...
     if fields.id_del in args:
         ...
     if fields.filter in args:
-        ...
+        taskList = loadTasks()
+        taskList.show(arguments.get(fields.filter))
 
 
 if __name__ == '__main__':
