@@ -111,7 +111,12 @@ def main():
             json_file.write(taskList.__repr__().replace("'", '"'))
         print(getColoredText(f"Задача успешно обновлена (ID: {_id}, описание: {new_description})", GREEN))
     if fields.id_del in args:
-        ...
+        _id = arguments.get(fields.id_del)
+        taskList = loadTasks()
+        taskList.delete(_id)
+        with open('tasks.json', 'w') as json_file:
+            json_file.write(taskList.__repr__().replace("'", '"'))
+        print(getColoredText(f"Задача с ID: {_id} удалена", GREEN))
     if fields.filter in args:
         taskList = loadTasks()
         taskList.show(arguments.get(fields.filter))

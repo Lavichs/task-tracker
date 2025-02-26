@@ -65,3 +65,6 @@ class TaskList:
             print(getColoredText(f"Задача с ID: {_id} не найдена", RED))
             sys.exit()
         task.description = new_description
+
+    def delete(self, _id):
+        self.tasks = list(filter(lambda task: task.id != _id, self.tasks))
