@@ -59,12 +59,19 @@ class TaskList:
             count += 1
         print(f"Total: {count}")
 
-    def update(self, _id, new_description):
-        task = next((task for task in self.tasks if task.id == _id), None)
-        if task is None:
-            print(getColoredText(f"Задача с ID: {_id} не найдена", RED))
-            sys.exit()
-        task.description = new_description
+    def update(self, _id, new_description=None, new_status=None):
+        if new_description is not None:
+            task = next((task for task in self.tasks if task.id == _id), None)
+            if task is None:
+                print(getColoredText(f"Задача с ID: {_id} не найдена", RED))
+                sys.exit()
+            task.description = new_description
+        elif new_status is not None:
+            task = next((task for task in self.tasks if task.id == _id), None)
+            if task is None:
+                print(getColoredText(f"Задача с ID: {_id} не найдена", RED))
+                sys.exit()
+            task.status = new_status
 
     def delete(self, _id):
         self.tasks = list(filter(lambda task: task.id != _id, self.tasks))

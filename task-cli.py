@@ -53,6 +53,13 @@ def main():
     delete_parser = subparsers.add_parser("delete", help='удалить. (delete task)')  # удаление
     list_parser = subparsers.add_parser("list",
                                         help='вывести список задач. (display a list of tasks)')  # вывод (чтение)
+    # изменение статуса на in-progress
+    mark_in_progress_parser = subparsers.add_parser("mark-in-progress",
+                                                    help='установить задаче статус "в процессе (in-progress)" '
+                                                         '(set task status in-progress)')
+    mark_done_parser = subparsers.add_parser("mark-done",
+                                             help='установить задаче статус "выполненная (done)" '
+                                                  '(set task status in done)')  # изменение статуса на done
 
     # аргументы для создания
     # описание новой задачи
@@ -81,13 +88,21 @@ def main():
                              nargs='?',
                              default="")
 
+    # аргументы для изменения статуса
+    # ID задачи которую нужно отметить выполняемой
+    mark_in_progress_parser.add_argument(fields.id_tmp,
+                                         type=int, help='ID задачи. (ID of task)')
+    # ID задачи которую нужно отметить выполненной
+    mark_done_parser.add_argument(fields.id_tmd,
+                                  type=int, help='ID задачи. (ID of task)')
+
     # парсинг аргументов вызова программы
     args = parser.parse_args()
     arguments = vars(args)  # конвертация Namespace в Dict для удобства работы
 
     # Выполнение разных сценариев в зависимости от выбранного действия
     # выбранное действие определяется по полученным аргументам полученным из парсера, т.к. у каждого субпарсера они свои
-    # если в аргументах есть description, значит выполняется действие add (далее description -> add)
+    # если в аргументах есть description, значит выполняется действие add
     if fields.description in args:
         taskList = loadTasks()
 
@@ -99,17 +114,20 @@ def main():
             json_file.write(taskList.__repr__().replace("'", '"'))
         print(getColoredText(f"Задача успешно добавлена (ID: {task.id})", GREEN))
 
+    # если в аргументах есть id_upd (id задачи для обновления), значит выполняется действие update
     if fields.id_upd in args:
         _id = arguments.get(fields.id_upd)
         new_description = arguments.get(fields.new_description)
 
         taskList = loadTasks()
-        taskList.update(_id, new_description)
+        taskList.update(_id, new_description=new_description)
 
         # сохранить список в формате json
         with open('tasks.json', 'w') as json_file:
             json_file.write(taskList.__repr__().replace("'", '"'))
         print(getColoredText(f"Задача успешно обновлена (ID: {_id}, описание: {new_description})", GREEN))
+
+    # если в аргументах есть id_del (id задачи для удаления), значит выполняется действие delete
     if fields.id_del in args:
         _id = arguments.get(fields.id_del)
         taskList = loadTasks()
@@ -117,9 +135,41 @@ def main():
         with open('tasks.json', 'w') as json_file:
             json_file.write(taskList.__repr__().replace("'", '"'))
         print(getColoredText(f"Задача с ID: {_id} удалена", GREEN))
+
+    # если в аргументах есть filter (статус задачи для выборки), значит выполняется действие List
     if fields.filter in args:
         taskList = loadTasks()
         taskList.show(arguments.get(fields.filter))
+
+    # если в аргументах есть id_tmp (id задачи для изменения статуса на in-progress),
+    # значит выполняется действие mark-in-progress
+    if fields.id_tmp in args:
+        _id = arguments.get(fields.id_tmp)
+        taskList = loadTasks()
+        taskList.update(_id, new_status=statuses.in_progress)
+
+        # сохранить список в формате json
+        with open('tasks.json', 'w') as json_file:
+            json_file.write(taskList.__repr__().replace("'", '"'))
+        print(getColoredText(
+            f"Статус задачи успешно изменен (ID: {_id}, статус: "
+            f"{getColoredText(statuses.in_progress, statuses.getStatusColor(statuses.in_progress))})",
+            GREEN))
+
+    # если в аргументах есть id_tmd (id задачи для изменения статуса на done),
+    # значит выполняется действие mark-in-done
+    if fields.id_tmd in args:
+        _id = arguments.get(fields.id_tmd)
+        taskList = loadTasks()
+        taskList.update(_id, new_status=statuses.done)
+
+        # сохранить список в формате json
+        with open('tasks.json', 'w') as json_file:
+            json_file.write(taskList.__repr__().replace("'", '"'))
+        print(getColoredText(
+            f"Статус задачи успешно изменен (ID: {_id}, статус: "
+            f"{getColoredText(statuses.done, statuses.getStatusColor(statuses.done))})",
+            GREEN))
 
 
 if __name__ == '__main__':

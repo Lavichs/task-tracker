@@ -23,6 +23,9 @@ class AdditionalFields:
     id_del = 'id_del'  # second field of command "delete"
     filter = 'filter'  # second field of command "list"
 
+    id_tmp = 'id_tmp'  # id to mark in-progress. for command mark-in-progress
+    id_tmd = 'id_tmd'  # id to mark done. for command mark-done
+
 
 # статусы задач
 class Statuses:
