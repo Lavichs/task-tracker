@@ -1,4 +1,9 @@
-# task-tracker
+# Task Tracker
+![GitHub repo size](https://img.shields.io/github/repo-size/Lavichs/task-tracker)
+![GitHub issues](https://img.shields.io/github/issues/Lavichs/task-tracker)
+![GitHub stars](https://img.shields.io/github/stars/Lavichs/task-tracker?style=social)
+![License](https://img.shields.io/github/license/Lavichs/task-tracker)
+
 
 Трекер задач — это учебный проект для отслеживания задач и управления ими. В данном проекте был создан простой интерфейс командной строки (CLI) для отслеживания актуальных, выполненных и запланированных задач. Выполнение данного проекта позволило попрактиковаться в... 
 
